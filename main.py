@@ -10,8 +10,8 @@ app = Flask(__name__)
 
 # uri = 'mongodb+srv://canal:canal@cluster0.vodgj.mongodb.net/appsNube?retryWrites=true&w=majority'
 
-uri = os.environ['MONGODB_URI'] + '?ssl_cert_reqs=CERT_NONE' 
-
+# uri = os.environ['MONGODB_URI'] + '?ssl_cert_reqs=CERT_NONE' 
+uri = 'mongodb+srv://fran:fran12@cluster0.zfsyd.mongodb.net/myFirstDatabase?retryWrites=true&w=majority&ssl=true'
 client = pymongo.MongoClient(uri)
 
 db = client.get_default_database()  
