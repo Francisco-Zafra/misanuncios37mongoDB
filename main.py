@@ -1,5 +1,7 @@
 import sys
 import os
+from urllib import response
+from models import Anuncio
 import pymongo
 
 from bson import ObjectId
@@ -16,48 +18,47 @@ client = pymongo.MongoClient(uri)
 
 db = client.get_default_database()  
 
-ads = db['ads']
+Anuncios = db['Anuncios']
 
 # Definicion de metodos para endpoints
 
-@app.route('/', methods=['GET'])
+@app.route('/Anuncio', methods=['GET'])
 def showAds():
     
-    return render_template('ads.html', ads = list(ads.find().sort('date',pymongo.DESCENDING)))
+    # return render_template('ads.html', ads = list(ads.find().sort('date',pymongo.DESCENDING)))
+    r = list(Anuncios.find())
+    if (request.args.get('nombre') != None):
+        r2 = r
+        r = []
+        for a in r2:
+            if a['nombre'] == request.args.get('nombre'):
+                r.append(a)
+    return str(r)
     
-@app.route('/new', methods = ['GET', 'POST'])
+@app.route('/Anuncio', methods = ['POST'])
 def newAd():
+    anuncio = Anuncio()
+    anuncio.nombre = request.json['nombre']
+    anuncio.descripcion = request.json['descripcion']
+    anuncio.longitud = request.json['longitud']
+    Anuncios.insert_one(anuncio.__dict__)
+    return str(list(Anuncios.find()))
 
-    if request.method == 'GET' :
-        return render_template('new.html')
-    else:
-        ad = {'author': request.form['inputAuthor'],
-              'text': request.form['inputText'], 
-              'priority': int(request.form['inputPriority']),
-              'date': datetime.now()
-             }
-        ads.insert_one(ad)
-        return redirect(url_for('showAds'))
-
-@app.route('/edit/<_id>', methods = ['GET', 'POST'])
+@app.route('/Anuncio/<_id>', methods = ['POST'])
 def editAd(_id):
     
-    if request.method == 'GET' :
-        ad = ads.find_one({'_id': ObjectId(_id)})
-        return render_template('edit.html', ad = ad)
-    else:
-        ad = { 'author': request.form['inputAuthor'],
-               'text': request.form['inputText'],
-               'priority' : int(request.form['inputPriority'])
-             }
-        ads.update_one({'_id': ObjectId(_id) }, { '$set': ad })    
-        return redirect(url_for('showAds'))
+    anuncio = Anuncio()
+    anuncio.nombre = request.json['nombre']
+    anuncio.descripcion = request.json['descripcion']
+    anuncio.longitud = request.json['longitud']
+    Anuncios.update_one({'_id': ObjectId(_id) }, { '$set': anuncio.__dict__ })    
+    return str(list(Anuncios.find()))
 
-@app.route('/delete/<_id>', methods = ['GET'])
+@app.route('/Anuncio/<_id>', methods = ['DELETE'])
 def deleteAd(_id):
     
-    adds.delete_one({'_id': ObjectId(_id)})
-    return redirect(url_for('showAds'))
+    Anuncios.delete_one({'_id': ObjectId(_id)})
+    return str(list(Anuncios.find()))
 
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App Engine

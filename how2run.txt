@@ -1,0 +1,9 @@
+LOCAL
+pip install –r requirements.txt
+heroku local web -f Procfile.windows 
+
+NUBE
+git add .
+git commit –m “Descripción del commit”
+git push heroku master
+heroku open
